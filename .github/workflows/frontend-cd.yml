@@ -17,7 +17,11 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: >-
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') &&
+      vars.AZURE_ACR_NAME != '' &&
+      vars.AZURE_FRONTEND_APP_NAME != '' &&
+      vars.AZURE_RESOURCE_GROUP != ''
     runs-on: ubuntu-latest
     environment: production
     steps:
