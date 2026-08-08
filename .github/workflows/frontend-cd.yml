@@ -70,12 +70,22 @@ jobs:
           test -n "$APP_NAME"
           test -n "$RESOURCE_GROUP"
           az extension add --name containerapp --upgrade --yes
-          az containerapp update \
-            --name "$APP_NAME" \
-            --resource-group "$RESOURCE_GROUP" \
-            --image "$ACR_NAME.azurecr.io/student-management-portal:$IMAGE_TAG" \
-            --revision-suffix "${IMAGE_TAG:0:7}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
-            --output none
+          for attempt in {1..12}; do
+            if update_output=$(az containerapp update \
+              --name "$APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --image "$ACR_NAME.azurecr.io/student-management-portal:$IMAGE_TAG" \
+              --revision-suffix "${IMAGE_TAG:0:7}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+              --output none 2>&1); then
+              break
+            fi
+            echo "$update_output"
+            if [[ "$update_output" != *ContainerAppOperationInProgress* ]] || (( attempt == 12 )); then
+              exit 1
+            fi
+            echo "::warning::Another repository is updating the portal; retrying in 15 seconds."
+            sleep 15
+          done
 
       - name: Verify health and portal
         env:
