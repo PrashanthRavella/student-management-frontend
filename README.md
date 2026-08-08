@@ -100,13 +100,13 @@ API docs are available at `http://localhost:8000/docs`.
 
 ## CI
 
-`.github/workflows/frontend-ci.yml` runs on pull requests and pushes to `main`. It uses Node 24 with npm caching, installs exactly `package-lock.json` using `npm ci`, then requires ESLint, Vitest, and the production build to pass. After successful `main` CI, `frontend-cd.yml` builds and pushes the image to Azure Container Registry and updates its Azure Container App using GitHub OIDC.
+`.github/workflows/frontend-ci.yml` runs on pull requests and pushes to `main`. It uses Node 24 with npm caching, installs exactly `package-lock.json` using `npm ci`, then requires ESLint, Vitest, and the production build to pass. After successful `main` CI, `frontend-cd.yml` checks out both repositories, builds the unified FastAPI and React image, pushes it to Azure Container Registry, and updates the shared portal Container App using GitHub OIDC.
 
 ## Azure deployment
 
-The companion backend repository owns `infra/main.bicep`, which provisions this frontend Container App alongside the API, Azure Container Registry, and managed PostgreSQL. Run the backend infrastructure workflow first, then configure this repository's protected `production` environment.
+The companion backend repository owns `Dockerfile.unified` and `infra/main.bicep`. Azure runs the FastAPI API and compiled React portal in one Container App while Azure Database for PostgreSQL remains a separate managed database service. The Container App exposes one shareable HTTPS URL: the portal is at `/`, API routes are under `/api`, and health is available at `/health`.
 
-Required secrets are `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID`; required variables are `AZURE_RESOURCE_GROUP`, `AZURE_ACR_NAME`, and `AZURE_FRONTEND_APP_NAME`. The Azure federated credential must trust this repository's `production` environment.
+Run the backend infrastructure deployment first, then configure this repository's protected `production` environment. Required secrets are `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID`; required variables are `AZURE_RESOURCE_GROUP`, `AZURE_ACR_NAME`, and `AZURE_PORTAL_APP_NAME`. The Azure federated credential must trust this repository's `production` environment.
 
 ## Troubleshooting
 
