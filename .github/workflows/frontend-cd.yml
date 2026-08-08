@@ -84,7 +84,8 @@ jobs:
         run: |
           fqdn=$(az containerapp show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" --query properties.configuration.ingress.fqdn --output tsv)
           portal_url="https://$fqdn"
-          curl --fail --retry 12 --retry-all-errors --retry-delay 10 "$portal_url/health"
-          curl --fail --retry 12 --retry-all-errors --retry-delay 10 --output /dev/null "$portal_url/"
+          curl_args=(--ipv4 --fail --show-error --retry 12 --retry-all-errors --retry-delay 10 --retry-max-time 180 --connect-timeout 10 --max-time 30)
+          curl "${curl_args[@]}" "$portal_url/health"
+          curl "${curl_args[@]}" --output /dev/null "$portal_url/"
           echo "### Production portal" >> "$GITHUB_STEP_SUMMARY"
           echo "[$portal_url]($portal_url)" >> "$GITHUB_STEP_SUMMARY"
