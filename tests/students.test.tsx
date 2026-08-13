@@ -10,6 +10,7 @@ vi.mock('../src/api/students', () => ({
   listStudents: vi.fn(),
   deleteStudent: vi.fn(),
 }))
+vi.mock('../src/auth/AuthContext', () => ({ useAuth: () => ({ user: { role: 'Admin' } }) }))
 
 const student: Student = {
   id: 1,
@@ -73,4 +74,3 @@ describe('students page', () => {
     await waitFor(() => expect(deleteStudent).toHaveBeenCalledWith(1))
   })
 })
-

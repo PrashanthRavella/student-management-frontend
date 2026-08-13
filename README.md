@@ -4,6 +4,9 @@ Responsive React interface for managing student records through the companion Fa
 
 ## Features
 
+- Secure login/logout and protected routes for Admin, Teacher, Student, and Parent accounts
+- Role-aware navigation and record-level student views
+- Course enrollment, grade-detail, academic-progress, user-management, and security-activity screens
 - Dashboard summary cards and a simple department bar chart
 - Searchable, filterable, sortable, paginated student table
 - Create, details, edit, and confirmed-delete workflows
